@@ -1,4 +1,11 @@
-import {Modal, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {
+  Button,
+  Modal,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import React, {useState, useEffect} from 'react';
 
 const GamePlayScreen = () => {
@@ -9,33 +16,58 @@ const GamePlayScreen = () => {
   const [nilesh, setNilesh] = useState(0);
   const [bot, setBot] = useState(0);
   const [totalSelectdCoin, setTotalSelectdCoin] = useState(0);
+  const [randomNumber, setrandomNumber] = useState(0);
+  const [playerName, setPlayerName] = useState("Nilesh")
 
-  //   console.log('nilesh', nilesh);
-  //   console.log('bot', bot);
-  const total = nilesh + bot;
-  console.log('total', total);
+  console.log('totalSelectdCoin', totalSelectdCoin);
 
   useEffect(() => {
     if (coin.length >= totalSelectdCoin) {
       if (!trunUser) {
+        setPlayerName("Nilesh")
         setNilesh(count => count + userCoinSelectionLimit);
-        console.log('totalSelectdCoin before', userCoinSelectionLimit);
         setTotalSelectdCoin(count => count + userCoinSelectionLimit);
         setModalVisible(true);
+        console.log('Nilesh Selection  ', userCoinSelectionLimit);
+        handleOnPress();
       } else {
-        setBot(count => count + userCoinSelectionLimit);
+          
+        setPlayerName("Bot")
+        console.log('bot Selection  ', userCoinSelectionLimit);
         setTotalSelectdCoin(count => count + userCoinSelectionLimit);
+        setBot(count => count + userCoinSelectionLimit);
+        setTrunUser(true);
         setModalVisible(true);
       }
     } else {
       setModalVisible(false);
     }
-  }, [trunUser, userCoinSelectionLimit]);
+  }, [trunUser, userCoinSelectionLimit, randomNumber]);
+
+  console.log("playerName",playerName)
+  const handleResetGame = () => {
+    setUserCoinSelectionLimit(0);
+    setTotalSelectdCoin(0);
+    setNilesh(0);
+    setBot(0);
+    setTrunUser(true);
+    setModalVisible(true);
+  };
+
+  const handleOnPress = val => {
+    if (trunUser) {
+      setUserCoinSelectionLimit(val);
+    } else {
+      setUserCoinSelectionLimit(Math.floor(Math.random() * 4) + 1);
+    }
+    setModalVisible(!modalVisible);
+    setTrunUser(!trunUser);
+  };
 
   return (
     <View style={{flex: 1, backgroundColor: 'red', padding: 20}}>
       <View>
-        {totalSelectdCoin < 21 ? (
+        {totalSelectdCoin <= 21 ? (
           <Text style={{fontSize: 20, fontWeight: 'bold'}}>
             User Trun : {trunUser ? 'Nilesh' : 'Bot'}
           </Text>
@@ -66,7 +98,7 @@ const GamePlayScreen = () => {
           </View>
         ))}
       </View>
-      {totalSelectdCoin < 21 ? (
+      {totalSelectdCoin <= 21 ? (
         <Modal
           animationType="slide"
           transparent={true}
@@ -92,11 +124,7 @@ const GamePlayScreen = () => {
                       alignItems: 'center',
                     }}
                     key={ind.toString()}
-                    onPress={() => {
-                      setUserCoinSelectionLimit(val);
-                      setModalVisible(!modalVisible);
-                      setTrunUser(!trunUser);
-                    }}>
+                    onPress={() => handleOnPress(val)}>
                     <Text style={{color: '#fff'}}>{val}</Text>
                   </TouchableOpacity>
                 ))}
@@ -105,16 +133,23 @@ const GamePlayScreen = () => {
           </View>
         </Modal>
       ) : (
-        <Text
-          style={{
-            textAlign: 'center',
-            marginTop: 50,
-            fontSize: 20,
-            fontWeight: 'bold',
-            color: '#000',
-          }}>
-          Opps {!trunUser ? 'Nilesh' : 'Bot'} Lost The Game !
-        </Text>
+        <View>
+          <Text
+            style={{
+              textAlign: 'center',
+              marginTop: 50,
+              fontSize: 20,
+              fontWeight: 'bold',
+              color: '#000',
+            }}>
+            Opps {playerName} Lost The Game !
+          </Text>
+          <Button
+            color={'green'}
+            title="Play again"
+            onPress={handleResetGame}
+          />
+        </View>
       )}
     </View>
   );
@@ -131,7 +166,7 @@ const styles = StyleSheet.create({
   },
   modalView: {
     margin: 20,
-    backgroundColor: 'white',
+    backgroundColor: '#fff',
     borderRadius: 20,
     padding: 35,
     alignItems: 'center',
@@ -147,23 +182,56 @@ const styles = StyleSheet.create({
   },
   button: {
     borderRadius: 20,
-    padding: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
     elevation: 2,
-  },
-  buttonOpen: {
-    backgroundColor: '#F194FF',
-  },
-  buttonClose: {
     backgroundColor: '#2196F3',
   },
-  textStyle: {
-    color: 'white',
+  buttonText: {
+    color: '#fff',
     fontWeight: 'bold',
     textAlign: 'center',
   },
   modalText: {
     marginBottom: 15,
     textAlign: 'center',
-    color: 'black',
+    color: '#000',
+    fontSize: 16,
+  },
+  coinContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexWrap: 'wrap',
+    marginVertical: 50,
+  },
+  coin: {
+    backgroundColor: '#2196F3',
+    width: 70,
+    height: 70,
+    borderRadius: 35,
+    justifyContent: 'center',
+    alignItems: 'center',
+    margin: 5,
+  },
+  coinText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#fff',
+  },
+  gameOverText: {
+    textAlign: 'center',
+    marginTop: 50,
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#000',
+  },
+  playAgainButton: {
+    marginTop: 20,
+    backgroundColor: '#4CAF50',
+    borderRadius: 20,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    alignSelf: 'center',
   },
 });
